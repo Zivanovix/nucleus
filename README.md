@@ -61,19 +61,21 @@ void userMain();
 
 The kernel provides three layered interfaces to the user program, as illustrated below:
 
-+--------------------------------+
-| User's program (app.lib)       |
-+--------------------------------+
-|          C++ OO API            |
-+--------------------------------+
-|            C API               |
-+--------------------------------+
-|            ABI                 |
-+================================+ &lt;--- Privilege Boundary (User/System Mode)
-|            Kernel              |
-+--------------------------------+
-| HW access module (hw.lib)      |
-+--------------------------------+
+```
++------------------------------------+
+| User's program (app.lib)           |
++------------------------------------+
+|            C++ OO API              |
++------------------------------------+
+|              C API                 |
++------------------------------------+
+|              ABI                   |
++====================================+ <-- Privilege Boundary (User/System Mode)
+|              Kernel                |
++------------------------------------+
+|   HW access module (hw.lib)        |
++------------------------------------+
+```
 
 
 The task involves implementing all shaded software layers (C++ OO API, C API, ABI, and Kernel). The hardware access module (`hw.lib`) and user test program (`app.lib`) are provided as static libraries. All layers are statically linked into a single executable.
