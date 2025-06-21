@@ -1,0 +1,167 @@
+GAS LISTING /tmp/cccKEWuq.s 			page 1
+
+
+   1              		.file	"main.c"
+   2              		.option nopic
+   3              		.option norelax
+   4              		.text
+   5              	.Ltext0:
+   6              		.cfi_sections	.debug_frame
+   7              		.align	2
+   8              		.globl	main
+  10              	main:
+  11              	.LFB0:
+  12              		.file 1 "src/main.c"
+   1:src/main.c    **** #include "../lib/console.h"
+   2:src/main.c    **** #include "../lib/hw.h"
+   3:src/main.c    **** 
+   4:src/main.c    **** 
+   5:src/main.c    **** 
+   6:src/main.c    **** void main() {
+  13              		.loc 1 6 13
+  14              		.cfi_startproc
+  15 0000 130101FF 		addi	sp,sp,-16
+  16              		.cfi_def_cfa_offset 16
+  17 0004 23341100 		sd	ra,8(sp)
+  18 0008 23308100 		sd	s0,0(sp)
+  19              		.cfi_offset 1, -8
+  20              		.cfi_offset 8, -16
+  21 000c 13040101 		addi	s0,sp,16
+  22              		.cfi_def_cfa 8, 0
+   7:src/main.c    ****     __putc('o');
+  23              		.loc 1 7 5
+  24 0010 1305F006 		li	a0,111
+  25 0014 97000000 		call	__putc
+  25      E7800000 
+  26              	.LVL0:
+   8:src/main.c    ****     __putc('s');
+  27              		.loc 1 8 5
+  28 001c 13053007 		li	a0,115
+  29 0020 97000000 		call	__putc
+  29      E7800000 
+  30              	.LVL1:
+   9:src/main.c    ****     __putc('1');
+  31              		.loc 1 9 5
+  32 0028 13051003 		li	a0,49
+  33 002c 97000000 		call	__putc
+  33      E7800000 
+  34              	.LVL2:
+  10:src/main.c    ****     __putc('\n');
+  35              		.loc 1 10 5
+  36 0034 1305A000 		li	a0,10
+  37 0038 97000000 		call	__putc
+  37      E7800000 
+  38              	.LVL3:
+  11:src/main.c    ****     __putc('\n');
+  39              		.loc 1 11 5
+  40 0040 1305A000 		li	a0,10
+  41 0044 97000000 		call	__putc
+  41      E7800000 
+  42              	.LVL4:
+GAS LISTING /tmp/cccKEWuq.s 			page 2
+
+
+  43              	.L2:
+  12:src/main.c    **** 
+  13:src/main.c    ****     while(1) {
+  44              		.loc 1 13 5 discriminator 1
+  45              	.LBB2:
+  14:src/main.c    ****         char character = __getc();
+  46              		.loc 1 14 9 discriminator 1
+  47              		.loc 1 14 26 is_stmt 0 discriminator 1
+  48 004c 97000000 		call	__getc
+  48      E7800000 
+  49              	.LVL5:
+  15:src/main.c    ****         __putc(character + 30);
+  50              		.loc 1 15 9 is_stmt 1 discriminator 1
+  51 0054 1B05E501 		addiw	a0,a0,30
+  52              	.LVL6:
+  53 0058 1375F50F 		andi	a0,a0,0xff
+  54 005c 97000000 		call	__putc
+  54      E7800000 
+  55              	.LVL7:
+  56              	.LBE2:
+  13:src/main.c    ****         char character = __getc();
+  57              		.loc 1 13 10 discriminator 1
+  58 0064 6FF09FFE 		j	.L2
+  59              		.cfi_endproc
+  60              	.LFE0:
+  62              	.Letext0:
+  63              		.file 2 "src/../lib/hw.h"
+  64              		.file 3 "src/../lib/console.h"
+GAS LISTING /tmp/cccKEWuq.s 			page 3
+
+
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 main.c
+     /tmp/cccKEWuq.s:10     .text:0000000000000000 main
+     /tmp/cccKEWuq.s:14     .text:0000000000000000 .L0 
+     /tmp/cccKEWuq.s:15     .text:0000000000000000 .L0 
+     /tmp/cccKEWuq.s:16     .text:0000000000000004 .L0 
+     /tmp/cccKEWuq.s:19     .text:000000000000000c .L0 
+     /tmp/cccKEWuq.s:20     .text:000000000000000c .L0 
+     /tmp/cccKEWuq.s:22     .text:0000000000000010 .L0 
+     /tmp/cccKEWuq.s:24     .text:0000000000000010 .L0 
+     /tmp/cccKEWuq.s:28     .text:000000000000001c .L0 
+     /tmp/cccKEWuq.s:32     .text:0000000000000028 .L0 
+     /tmp/cccKEWuq.s:36     .text:0000000000000034 .L0 
+     /tmp/cccKEWuq.s:40     .text:0000000000000040 .L0 
+     /tmp/cccKEWuq.s:46     .text:000000000000004c .L0 
+     /tmp/cccKEWuq.s:47     .text:000000000000004c .L0 
+     /tmp/cccKEWuq.s:48     .text:000000000000004c .L0 
+     /tmp/cccKEWuq.s:51     .text:0000000000000054 .L0 
+     /tmp/cccKEWuq.s:58     .text:0000000000000064 .L0 
+     /tmp/cccKEWuq.s:59     .text:0000000000000068 .L0 
+     /tmp/cccKEWuq.s:65     .text:0000000000000068 .L0 
+                     .debug_frame:0000000000000000 .L0 
+     /tmp/cccKEWuq.s:43     .text:000000000000004c .L2
+     /tmp/cccKEWuq.s:286    .debug_abbrev:0000000000000000 .Ldebug_abbrev0
+     /tmp/cccKEWuq.s:585    .debug_str:0000000000000144 .LASF21
+     /tmp/cccKEWuq.s:555    .debug_str:000000000000005a .LASF22
+     /tmp/cccKEWuq.s:561    .debug_str:000000000000007f .LASF23
+     /tmp/cccKEWuq.s:5      .text:0000000000000000 .Ltext0
+     /tmp/cccKEWuq.s:62     .text:0000000000000068 .Letext0
+     /tmp/cccKEWuq.s:539    .debug_line:0000000000000000 .Ldebug_line0
+     /tmp/cccKEWuq.s:541    .debug_str:0000000000000000 .LASF0
+     /tmp/cccKEWuq.s:577    .debug_str:0000000000000102 .LASF1
+     /tmp/cccKEWuq.s:565    .debug_str:00000000000000a9 .LASF2
+     /tmp/cccKEWuq.s:559    .debug_str:0000000000000078 .LASF4
+     /tmp/cccKEWuq.s:553    .debug_str:0000000000000048 .LASF3
+     /tmp/cccKEWuq.s:547    .debug_str:000000000000002a .LASF5
+     /tmp/cccKEWuq.s:557    .debug_str:0000000000000065 .LASF6
+     /tmp/cccKEWuq.s:575    .debug_str:00000000000000ef .LASF7
+     /tmp/cccKEWuq.s:583    .debug_str:0000000000000134 .LASF8
+     /tmp/cccKEWuq.s:543    .debug_str:000000000000000d .LASF9
+     /tmp/cccKEWuq.s:545    .debug_str:000000000000001b .LASF10
+     /tmp/cccKEWuq.s:581    .debug_str:0000000000000125 .LASF11
+     /tmp/cccKEWuq.s:549    .debug_str:0000000000000031 .LASF12
+     /tmp/cccKEWuq.s:579    .debug_str:0000000000000115 .LASF13
+     /tmp/cccKEWuq.s:563    .debug_str:000000000000009d .LASF14
+     /tmp/cccKEWuq.s:573    .debug_str:00000000000000d9 .LASF15
+     /tmp/cccKEWuq.s:571    .debug_str:00000000000000c3 .LASF16
+     /tmp/cccKEWuq.s:567    .debug_str:00000000000000b7 .LASF24
+     /tmp/cccKEWuq.s:11     .text:0000000000000000 .LFB0
+     /tmp/cccKEWuq.s:60     .text:0000000000000068 .LFE0
+     /tmp/cccKEWuq.s:45     .text:000000000000004c .LBB2
+     /tmp/cccKEWuq.s:56     .text:0000000000000064 .LBE2
+     /tmp/cccKEWuq.s:589    .debug_str:00000000000001e7 .LASF17
+     /tmp/cccKEWuq.s:519    .debug_loc:0000000000000000 .LLST0
+     /tmp/cccKEWuq.s:49     .text:0000000000000054 .LVL5
+     /tmp/cccKEWuq.s:55     .text:0000000000000064 .LVL7
+     /tmp/cccKEWuq.s:26     .text:000000000000001c .LVL0
+GAS LISTING /tmp/cccKEWuq.s 			page 4
+
+
+     /tmp/cccKEWuq.s:30     .text:0000000000000028 .LVL1
+     /tmp/cccKEWuq.s:34     .text:0000000000000034 .LVL2
+     /tmp/cccKEWuq.s:38     .text:0000000000000040 .LVL3
+     /tmp/cccKEWuq.s:42     .text:000000000000004c .LVL4
+     /tmp/cccKEWuq.s:587    .debug_str:00000000000001e2 .LASF18
+     /tmp/cccKEWuq.s:551    .debug_str:0000000000000041 .LASF19
+     /tmp/cccKEWuq.s:569    .debug_str:00000000000000bc .LASF20
+     /tmp/cccKEWuq.s:52     .text:0000000000000058 .LVL6
+     /tmp/cccKEWuq.s:66     .debug_info:0000000000000000 .Ldebug_info0
+
+UNDEFINED SYMBOLS
+__putc
+__getc
