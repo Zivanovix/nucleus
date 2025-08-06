@@ -1,0 +1,8 @@
+# Ignore build ouput files
+/build/
+
+.idea/
+
+kernel
+kernel.asm
+.gdbinit
