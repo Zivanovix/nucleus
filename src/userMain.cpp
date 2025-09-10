@@ -1,34 +1,44 @@
 #include "../lib/hw.h"
-#include "../h/syscall_c.h"
-#include "../lib/console.h"
+#include "../h/syscall_c.hpp"
+#include "../h/print.hpp"
+#include "../h/workers.hpp"
+#include "../h/tcb.hpp"
 
 
 typedef struct Point {
 	int x,y;
 }Point;
 extern "C" void userMain() {
-// korisnicki rezim, ali su prekidi maskirani, ra nije odredjen lepo
-	Point* a = (Point*)mem_alloc((size_t)sizeof(Point));
-	a->x = 40;
-	a->y = 8;
-	/*__putc('H');
-	__putc('i');
-	__putc(' ');
-	__putc('n');
-	__putc('u');
-	__putc('c');
-	__putc('l');
-	__putc('e');
-	__putc('u');
-	__putc('s');
-	__putc('\n');*/
+	thread_t threadHandles[4];
 
-	__putc(a->x + a->y);
+	thread_create(&threadHandles[0], workerBodyA, nullptr);
 
-	int status = mem_free(a);
-	if (status < 0) __putc('L');
-	else {
-		a = 0;
-		__putc('W');
+	thread_create(&threadHandles[1], workerBodyB, nullptr);
+
+	thread_create(&threadHandles[2], workerBodyC, nullptr);
+
+	thread_create(&threadHandles[3], workerBodyD, nullptr);
+
+	while (true) {
+
+		thread_dispatch();
 	}
+
+/*
+	thread_create(&threadHandles[1], workerBodyB, nullptr);
+	printString("Thread B created\n");
+
+	thread_create(&threadHandles[2], workerBodyC, nullptr);
+	printString("Thread C created\n");
+
+	thread_create(&threadHandles[3], workerBodyD, nullptr);
+	printString("Thread D created\n");
+
+
+
+	while (true) {
+		thread_dispatch();
+	}
+*/
+
 }

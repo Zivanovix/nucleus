@@ -104,3 +104,28 @@ size_t MemoryAllocator::blocksToBytes(size_t numBlocks){
     return numBlocks*MEM_BLOCK_SIZE;
 }
 
+size_t MemoryAllocator::kgetFreeSpace(){
+    size_t sum = 0;
+    ChunkHeader* curr = freeChunks;
+    while(curr) {
+        sum += blocksToBytes(curr->size);
+        curr = curr->nextFree;
+    }
+
+    return sum;
+
+}
+
+size_t MemoryAllocator::kgetLargestFreeBlock() {
+
+    ChunkHeader* curr = freeChunks;
+    ChunkHeader* largest = curr;
+    while(curr) {
+        if(curr->size > largest->size)
+            largest = curr;
+        curr = curr->nextFree;
+    }
+
+    return blocksToBytes(largest->size);
+}
+

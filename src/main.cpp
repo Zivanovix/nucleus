@@ -1,10 +1,16 @@
 #include "../lib/console.h"
 #include "../lib/hw.h"
 #include "../h/MemoryAllocator.hpp"
-#include "../h/syscall_c.h"
+#include "../h/syscall_c.hpp"
+
+#include "../h/tcb.hpp"
+#include "../h/print.hpp"
+#include "../h/workers.hpp"
+#include "../h/riscv.hpp"
 
 extern "C" void userMain();
 
+/*
 extern "C" void supervisorTrap();
 
 
@@ -46,6 +52,8 @@ typedef struct Context {
     uint64 sp;  // Offset 0xF0
 } Context;
 
+
+
 void handleSystemCall(Context* context) {
 	// read the syscall id from a0 and based on it call the correct kernel function
 	SyscallId syscall_id = static_cast<SyscallId>(context->a0);
@@ -81,7 +89,7 @@ extern "C" void handleSupervisorTrap(Context* context) {
 		__asm__ volatile ("csrw sepc, %0" : : "r" (sepcVal));
 		// read the registers
 		handleSystemCall(context);
-		/*__putc('H');
+		__putc('H');
 		__putc('i');
 		__putc(' ');
 		__putc('m');
@@ -91,7 +99,7 @@ extern "C" void handleSupervisorTrap(Context* context) {
 		__putc('s');
 		__putc('e');
 		__putc('r');
-		__putc('\n');*/
+		__putc('\n');
 
 
 		__asm__ volatile ("csrc sip, 0x02");
@@ -106,8 +114,11 @@ extern "C" void handleSupervisorTrap(Context* context) {
 void countReturnAddress() {
 	__putc('\n');
 }
+*/
+
 
 void main() {
+	/*
 	uint64 raVal;
 	__asm__ volatile ("csrw stvec, %[trapHandlerAddr]" : : [trapHandlerAddr] "r" (&supervisorTrap));
 
@@ -118,5 +129,59 @@ void main() {
 	raVal += 16;
 	__asm__ volatile ("mv ra, %0" : : "r" (raVal));
 	__asm__ volatile ("sret");
+
+
+	TCB* threads[5];
+	threads[0] = TCB::createThread(nullptr);
+	TCB::running = threads[0];
+
+	threads[1] = TCB::createThread(workerBodyA);
+	printString("Thread A created\n");
+
+	threads[2] = TCB::createThread(workerBodyB);
+	printString("Thread B created\n");
+
+	threads[3] = TCB::createThread(workerBodyC);
+	printString("Thread C created\n");
+
+	threads[4] = TCB::createThread(workerBodyD);
+	printString("Thread D created\n");
+
+	Riscv::w_stvec((uint64) &Riscv::supervisorTrap);
+	Riscv::ms_sstatus(Riscv::SSTATUS_SIE);
+
+	while (!(threads[1]->isFinished() && threads[2]->isFinished() &&
+			threads[3]->isFinished() && threads[4]->isFinished())) {
+
+		TCB::yield();
+	}
+
+	for (auto thread :  threads) {
+		delete thread;
+	}
+	*/
+	Riscv::w_stvec((uint64) &Riscv::supervisorTrap);
+
+
+
+	size_t size = MemoryAllocator::bytesToBlocksCeil(DEFAULT_STACK_SIZE);
+	//void* stack = MemoryAllocator::Instance()->kmemAlloc(size);
+	void* stack = MemoryAllocator::Instance()->kmemAlloc(size);
+	void* stack_pointer = (char*)stack + DEFAULT_STACK_SIZE;
+
+	TCB* threads[2];
+	threads[0] = TCB::createThread(nullptr, 0);
+	TCB::running = threads[0];
+
+	threads[1] = TCB::createThread(&userMain, (uint64)stack_pointer);
+
+	//while(!(threads[1]->isFinished()))
+	//{
+		printString("Yield from kernel main\n");
+		TCB::yield();
+	//}
+
+
+
 
 }
