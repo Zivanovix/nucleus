@@ -151,6 +151,12 @@ int sem_signal(sem_t id) {
 	return (int)(long)trigger_syscall(SEM_SIGNAL, args, 1);
 }
 
+void putc(char c) {
+	uint64 args[1];
+	args[0] = (uint64)(uint8)c;
+	trigger_syscall(PUTC, args, 1);
+}
+
 #ifdef __cplusplus
 }
 #endif

@@ -4,6 +4,8 @@
 #include "../h/semaphore.hpp"
 #include "../h/tcb.hpp"
 #include "../h/scheduler.hpp"
+#include "../h/riscv.hpp"
+#include "../h/print.hpp"
 
 
 int Semaphore::signal() {
@@ -31,15 +33,23 @@ int Semaphore::wait() {
 void Semaphore::block() {
 
 	TCB* old = TCB::running;
+
 	old->setBlocked();
 	blockedThreadsQueue.addLast(old);
 
 	TCB::running = Scheduler::get();
 	TCB::timeSliceCounter = 0;
 
+	if(old->getRunMode() == TCB::PrivilegeLevel::SUPERVISOR) {
+		Riscv::pushRegisters();
+	}
 
 	TCB::contextSwitch(&old->context, &TCB::running->context);
 
+	if(TCB::running->getRunMode() == TCB::PrivilegeLevel::SUPERVISOR) {
+		//Riscv::popSppSpie();
+		Riscv::popRegisters();
+	}
 }
 
 int Semaphore::unblock() {

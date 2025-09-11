@@ -5,10 +5,11 @@
 
 #include "../h/tcb.hpp"
 #include "../h/print.hpp"
+#include "../h/Console.hpp"
 #include "../h/workers.hpp"
 #include "../h/riscv.hpp"
 
-extern "C" void userMain();
+extern "C" void userMain(void*);
 
 /*
 extern "C" void supervisorTrap();
@@ -163,22 +164,34 @@ void main() {
 	Riscv::w_stvec((uint64) &Riscv::supervisorTrap);
 
 
+	//putc('a');
+
 
 	size_t size = MemoryAllocator::bytesToBlocksCeil(DEFAULT_STACK_SIZE);
-	//void* stack = MemoryAllocator::Instance()->kmemAlloc(size);
 	void* stack = MemoryAllocator::Instance()->kmemAlloc(size);
 	void* stack_pointer = (char*)stack + DEFAULT_STACK_SIZE;
 
-	TCB* threads[2];
+	TCB* threads[3];
 	threads[0] = TCB::createThread(nullptr, 0);
 	TCB::running = threads[0];
 
 	threads[1] = TCB::createThread(&userMain, (uint64)stack_pointer);
 
+
+
+	stack = MemoryAllocator::Instance()->kmemAlloc(size);
+	stack_pointer = (char*)stack + DEFAULT_STACK_SIZE;
+
+	threads[2] = TCB::createThread(Console::writeToController, (uint64)stack_pointer, Console::Instance(), TCB::PrivilegeLevel::SUPERVISOR);
+
 	//while(!(threads[1]->isFinished()))
 	//{
-		printString("Yield from kernel main\n");
-		TCB::yield();
+	// Razmisli o koriscenju semafora za uslovnu sinhronizaciju tako da kada se userMain zavrsi on oslobodi kernel
+	// koji fino zavrsi program
+
+
+	//printString("Yield from kernel main\n");
+	TCB::yield();
 	//}
 
 

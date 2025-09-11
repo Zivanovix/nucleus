@@ -10,8 +10,20 @@
 TCB* TCB::running = nullptr;
 uint64 TCB::timeSliceCounter = 0;
 
-TCB* TCB::createThread(Body body, uint64 sp) {
-	return new TCB(body, sp);
+TCB* TCB::createThread(Body body, uint64 sp, void* arg, PrivilegeLevel mode) {
+	return new TCB(body, sp, arg, mode);
+}
+
+
+TCB::TCB (Body body, uint64 sp, void* arg, PrivilegeLevel mode) : body(body), arg(arg),
+										stackBound(body ? sp - DEFAULT_STACK_SIZE : 0),
+										timeSlice(DEFAULT_TIME_SLICE),
+										context({
+											(uint64) &threadWrapper,
+											sp
+										}), status(ThreadStatus::READY), runMode(mode)
+{
+	if (body) Scheduler::put(this);
 }
 
 void TCB::dispatch() {
@@ -24,7 +36,16 @@ void TCB::dispatch() {
 
 	running = Scheduler::get();
 
+	if(old->getRunMode() == PrivilegeLevel::SUPERVISOR) {
+		Riscv::pushRegisters();
+	}
+
 	TCB::contextSwitch(&old->context, &running->context);
+
+	if(running->getRunMode() == PrivilegeLevel::SUPERVISOR) {
+		Riscv::popRegisters();
+		//Riscv::popSppSpie();
+	}
 
 }
 
@@ -43,8 +64,9 @@ void TCB::yield(){
 }
 
 void TCB::threadWrapper() {
+	void* par = running->arg;
 	Riscv::popSppSpie();
-	running->body();
+	running->body(par);
 	running->setFinished();
 	thread_dispatch(); // yield ili sistemski poziv
 

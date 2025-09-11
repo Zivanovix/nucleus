@@ -9,9 +9,18 @@
 #include "../h/syscall_c.hpp"
 #include "../h/MemoryAllocator.hpp"
 #include "../h/semaphore.hpp"
+#include "../h/Console.hpp"
+
 
 void Riscv::popSppSpie(){
 	//mc_sie(SIP_SSIP);
+
+	if(TCB::running->getRunMode() == TCB::PrivilegeLevel::SUPERVISOR)
+		ms_sstatus(SSTATUS_SPP);
+	else
+		mc_sstatus(SSTATUS_SPP);
+
+
 	__asm__ volatile("csrw sepc, ra");
 	__asm__ volatile("sret");
 
@@ -23,8 +32,8 @@ void Riscv::handleSupervisorTrap(Context* context) {
 
 	if (scause == 0x09UL) {
 	// ecall from S mode
-		uint64 sepc = r_sepc() + 4;
-		uint64 sstatus = r_sstatus();
+		volatile uint64 sepc = r_sepc() + 4;
+		volatile uint64 sstatus = r_sstatus();
 
 		TCB::dispatch();
 
@@ -34,8 +43,8 @@ void Riscv::handleSupervisorTrap(Context* context) {
 	}
 	else if (scause == 0x08UL) {
 	// ecall from U mode
-		uint64 sepc = r_sepc() + 4;
-		uint64 sstatus = r_sstatus();
+		volatile uint64 sepc = r_sepc() + 4;
+		volatile uint64 sstatus = r_sstatus();
 
 		handleSystemCalls(context);
 
@@ -46,8 +55,8 @@ void Riscv::handleSupervisorTrap(Context* context) {
 	// timer interrupt
 		TCB::timeSliceCounter++;
 		if(TCB::timeSliceCounter >= TCB::running->getTimeSlice()) {
-			uint64 sepc = r_sepc();
-			uint64 sstatus = r_sstatus();
+			volatile uint64 sepc = r_sepc();
+			volatile uint64 sstatus = r_sstatus();
 
 			TCB::dispatch();
 
@@ -59,7 +68,10 @@ void Riscv::handleSupervisorTrap(Context* context) {
 	}
 	else if (scause == (0x01UL << 63 | 0x09)) {
 	 // external hardware interrupt (console)
-		console_handler();
+		//console_handler();
+ 		int id = plic_claim();
+
+		plic_complete(id);
 
 	}
 	else{
@@ -75,7 +87,8 @@ void Riscv::handleSystemCalls(Context* context) {
 	// read the syscall id from a0(x10) and based on it call the correct kernel function
 	SyscallId syscall_id = static_cast<SyscallId>(context->x[10]);
 	uint64 result = 0;
-
+	//Console::Instance()->putc('X');
+	//Console::Instance()->putc('a');
 	switch (syscall_id) {
 		case MEM_ALLOC: {
 			size_t arg1 = static_cast<size_t>(context->x[11]); // x11 = a1
@@ -98,12 +111,12 @@ void Riscv::handleSystemCalls(Context* context) {
 		}
 		case THREAD_CREATE: {
 			TCB** handle = reinterpret_cast<TCB**>(context->x[11]);
-			void (*startRoutine)() = reinterpret_cast<void (*)()>(context->x[12]);
-			//void* arg = reinterpret_cast<void*>(context->x[13]);
+			void (*startRoutine)(void*) = reinterpret_cast<void (*)(void*)>(context->x[12]);
+			void* arg = reinterpret_cast<void*>(context->x[13]);
 			uint64 threadSp = context->x[14];
 
-			TCB* thread = TCB::createThread(startRoutine, threadSp);
-			// ako se ne uspe sa alokacijom objekta jezgra digni gresku!
+			TCB* thread = TCB::createThread(startRoutine, threadSp, arg);
+			// if allocation fails signal the error!
 			if (handle && thread)
 				*handle = thread;
 			else
@@ -151,6 +164,11 @@ void Riscv::handleSystemCalls(Context* context) {
 		case SEM_SIGNAL: {
 			Semaphore* semHandle = reinterpret_cast<Semaphore*>(context->x[11]);
 			result = semHandle->signal();
+			break;
+		}
+		case PUTC: {
+			char c = static_cast<char>(context->x[11]);
+			Console::Instance()->putc(c);
 			break;
 		}
 		default: {

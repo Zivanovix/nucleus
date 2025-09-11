@@ -8,7 +8,9 @@
 typedef struct Point {
 	int x,y;
 }Point;
-extern "C" void userMain() {
+extern "C" void userMain(void* x) {
+
+
 	thread_t threadHandles[4];
 
 	thread_create(&threadHandles[0], workerBodyA, nullptr);
@@ -19,8 +21,11 @@ extern "C" void userMain() {
 
 	thread_create(&threadHandles[3], workerBodyD, nullptr);
 
-	while (true) {
 
+
+	while (true) {
+		//printString("\nIdemo Srbijaa\n");
+		//putc('a');
 		thread_dispatch();
 	}
 

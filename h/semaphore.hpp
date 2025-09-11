@@ -3,7 +3,7 @@
 //
 
 #ifndef SEMAPHORE_HPP
-#define SEMAPHORE_HP
+#define SEMAPHORE_HPP
 
 #include "list.hpp"
 #include "../lib/hw.h"

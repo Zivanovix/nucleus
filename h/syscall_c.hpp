@@ -14,6 +14,8 @@ typedef TCB* thread_t;
 class Semaphore;
 typedef Semaphore* sem_t;
 
+const int EOF = -1;
+
 typedef enum {
 	MEM_ALLOC = 0X01,
 	MEM_FREE = 0X02UL,
@@ -25,7 +27,9 @@ typedef enum {
 	SEM_OPEN = 0x21,
 	SEM_CLOSE = 0X22,
 	SEM_WAIT = 0X23,
-	SEM_SIGNAL = 0X24
+	SEM_SIGNAL = 0X24,
+	GETC = 0X41,
+	PUTC = 0x42
 } SyscallId;
 
 uint64 trigger_syscall(SyscallId id, uint64* args, uint8 argc) ;
@@ -44,6 +48,7 @@ int sem_close(sem_t handle);
 int sem_wait(sem_t id);
 int sem_signal(sem_t id);
 
+void putc(char c);
 
 #ifdef __cplusplus
 }

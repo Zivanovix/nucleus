@@ -8,14 +8,14 @@
 #include "../lib/hw.h"
 #include "scheduler.hpp"
 #include "riscv.hpp"
+#include "semaphore.hpp"
 
-class Semaphore;
 
 class TCB {
 public:
 	friend class Riscv;
 	friend class Semaphore;
-	using Body = void (*)();
+	using Body = void (*)(void*);
 
 	enum class ThreadStatus {
 		READY,
@@ -23,7 +23,12 @@ public:
 		BLOCKED
 	};
 
-	static TCB* createThread(Body body, uint64 sp);
+	enum class PrivilegeLevel {
+		USER,
+		SUPERVISOR
+	};
+
+	static TCB* createThread(Body body, uint64 sp, void* arg = nullptr, PrivilegeLevel mode = PrivilegeLevel::USER);
 	~TCB() = default;
 
 	static TCB* running;
@@ -44,37 +49,38 @@ public:
 
 	void setReady() { status = ThreadStatus::READY; }
 
-private:
-	TCB (Body body, uint64 sp) : body(body),
-										stackBound(body ? sp - DEFAULT_STACK_SIZE : 0),
-										context({
-											(uint64) &threadWrapper,
-											sp
-										}), timeSlice(DEFAULT_TIME_SLICE),
-										status(ThreadStatus::READY)
-	{
-		if (body) Scheduler::put(this);
-	}
+	PrivilegeLevel getRunMode() const { return runMode; }
 
+protected:
 	struct Context {
 		uint64 ra;
 		uint64 sp;
 	};
 
-	Body body;
-	uint64 stackBound;
-	Context context;
-	uint64 timeSlice;
-	ThreadStatus status;
-
-
-	static uint64 timeSliceCounter;
+	TCB (Body body, uint64 sp, void* arg = nullptr, PrivilegeLevel mode = PrivilegeLevel::USER);
 
 	static void threadWrapper();
 
 	static void contextSwitch(Context* oldContext, Context* newContext);
 
 	static void dispatch();
+
+private:
+
+	Body body;
+
+	void* arg;
+
+	uint64 stackBound, timeSlice;
+
+	Context context;
+
+	ThreadStatus status;
+
+	PrivilegeLevel runMode; // 0 for user mode 1 for supervisor mode
+
+	static uint64 timeSliceCounter;
+
 
 };
 
