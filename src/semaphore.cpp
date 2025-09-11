@@ -47,7 +47,6 @@ void Semaphore::block() {
 	TCB::contextSwitch(&old->context, &TCB::running->context);
 
 	if(TCB::running->getRunMode() == TCB::PrivilegeLevel::SUPERVISOR) {
-		//Riscv::popSppSpie();
 		Riscv::popRegisters();
 	}
 }

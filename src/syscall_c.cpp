@@ -8,6 +8,7 @@
 extern "C" {
 #endif
 
+
 uint64 trigger_syscall(SyscallId id, uint64 args[], uint8 argc) {
 
 	if (argc < 0 || argc > MAX_ARG_COUNT) return -2;
@@ -19,7 +20,15 @@ uint64 trigger_syscall(SyscallId id, uint64 args[], uint8 argc) {
 	for (uint64 i = 0; i < argc; i++) {
 		local_args[i] = args[i];
 	}
-
+	// why am i saving all 7 registers every time?
+	// i want to do it all in one block because if i use line blocks
+	// each line would not know that it shouldnt use ai for current register
+	// where i is smaller index than the index of current register
+	// this is slower but safer that way, also for system calls the restoring of
+	// non s-type registers is not guaranteed, and because there are a lot of temp regs
+	// used, non s-type registers wont be restored correctly almost guaranteed
+	// but the compiler should anyway be aware of that and generate the proper code
+	// for async interrupts everything will be restored correctly
 	asm volatile (
 		"mv a0, %1\n\t"          // syscall ID u a0
 		"mv a1, %2\n\t"          // arg0 u a1
@@ -45,6 +54,7 @@ uint64 trigger_syscall(SyscallId id, uint64 args[], uint8 argc) {
 
 	return ret_val;
 }
+
 
 
 /*
@@ -155,6 +165,10 @@ void putc(char c) {
 	uint64 args[1];
 	args[0] = (uint64)(uint8)c;
 	trigger_syscall(PUTC, args, 1);
+}
+
+char getc() {
+	return (char)(uint8)trigger_syscall(GETC, 0, 0);
 }
 
 #ifdef __cplusplus

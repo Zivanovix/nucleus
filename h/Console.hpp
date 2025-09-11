@@ -13,11 +13,18 @@ public:
 	static Console* Instance();
 
 	void putc(char c);
+
 	char getc();
 
 	static void writeToController(void*);
 
+	// this thread will run in backgrond in U mode
+	// allowing the console controler to interrupt it
+	static void ghostThread(void*);
 
+	void consoleHandler();
+
+	BoundedBuffer& getReadBuffer() { return rBuff; }
 protected:
 	Console(){}
 

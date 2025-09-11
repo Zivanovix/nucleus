@@ -14,13 +14,16 @@ public:
 	BoundedBuffer();
 
 	void append(char c);
+
 	char pop();
+
+	void nonBlockingAppend(char c);
 
 private:
 	Semaphore spaceAvailable, itemAvailable;
 
 	char buffer[N];
-	int head, tail;
+	int head, tail, size;
 
 };
 #endif //PROJECT_BASE_BOUNDEDBUFFER_HPP

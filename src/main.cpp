@@ -171,7 +171,7 @@ void main() {
 	void* stack = MemoryAllocator::Instance()->kmemAlloc(size);
 	void* stack_pointer = (char*)stack + DEFAULT_STACK_SIZE;
 
-	TCB* threads[3];
+	TCB* threads[4];
 	threads[0] = TCB::createThread(nullptr, 0);
 	TCB::running = threads[0];
 
@@ -182,7 +182,15 @@ void main() {
 	stack = MemoryAllocator::Instance()->kmemAlloc(size);
 	stack_pointer = (char*)stack + DEFAULT_STACK_SIZE;
 
+
 	threads[2] = TCB::createThread(Console::writeToController, (uint64)stack_pointer, Console::Instance(), TCB::PrivilegeLevel::SUPERVISOR);
+
+
+	stack = MemoryAllocator::Instance()->kmemAlloc(size);
+	stack_pointer = (char*)stack + DEFAULT_STACK_SIZE;
+
+	threads[3] = TCB::createThread(Console::ghostThread, (uint64)stack_pointer);
+
 
 	//while(!(threads[1]->isFinished()))
 	//{

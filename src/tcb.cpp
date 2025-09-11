@@ -44,7 +44,6 @@ void TCB::dispatch() {
 
 	if(running->getRunMode() == PrivilegeLevel::SUPERVISOR) {
 		Riscv::popRegisters();
-		//Riscv::popSppSpie();
 	}
 
 }

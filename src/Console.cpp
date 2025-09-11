@@ -17,7 +17,12 @@ void Console::putc(char c) {
 	wBuff.append(c);
 }
 
-// This will be run as the consumer kernel thread for wbuff
+char Console::getc() {
+	char c = rBuff.pop();
+	return c;
+}
+
+// This will be run as the consumer kernel thread in S mode for wbuff
 void Console::writeToController(void* cons) {
 	Console* console = (Console*) cons;
 	while(true){
@@ -31,10 +36,28 @@ void Console::writeToController(void* cons) {
 		while(!(*(uint8*)(CONSOLE_STATUS) & CONSOLE_TX_STATUS_BIT));
 
 		*(char*)(CONSOLE_TX_DATA) = c;
+
 	}
-
-
 }
+
+// potential run this thread when there are no others in scheduler
+void Console::ghostThread(void* x) {
+	// this thread is run in a U mode and can be interrupted bu the console controler
+	// after console handler has finished it has to unblock the user thread waiting on input
+	while(true);
+}
+
+void Console::consoleHandler() {
+
+	while(*(uint8*)(CONSOLE_STATUS) & CONSOLE_RX_STATUS_BIT) {
+		char c = *(char*)(CONSOLE_RX_DATA);
+		// ovde necu sinhronizaciju jer ne smem da ugasim nit koja je prekinuta
+		// nego cu samo odbaciti karaktere ili sta god
+		rBuff.nonBlockingAppend(c);
+	}
+}
+
+
 
 
 /*extern const uint64 CONSOLE_STATUS;

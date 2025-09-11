@@ -69,9 +69,25 @@ void Riscv::handleSupervisorTrap(Context* context) {
 	else if (scause == (0x01UL << 63 | 0x09)) {
 	 // external hardware interrupt (console)
 		//console_handler();
+
  		int id = plic_claim();
+		// interrupt for reading from console
+		if(id == CONSOLE_IRQ && (*(uint8*)(CONSOLE_STATUS) & CONSOLE_RX_STATUS_BIT)){
+			Console::Instance()->consoleHandler();
+
+
+			while((*(uint8*)(CONSOLE_STATUS) & CONSOLE_RX_STATUS_BIT)) {
+				char c = *(char*)(CONSOLE_TX_DATA);
+				// ovde necu sinhronizaciju jer ne smem da ugasim nit koja je prekinuta
+				// nego cu samo odbaciti karaktere ili sta god
+				(Console::Instance()->getReadBuffer()).append(c);
+			}
+
+		}
 
 		plic_complete(id);
+
+
 
 	}
 	else{
@@ -169,6 +185,11 @@ void Riscv::handleSystemCalls(Context* context) {
 		case PUTC: {
 			char c = static_cast<char>(context->x[11]);
 			Console::Instance()->putc(c);
+			break;
+		}
+		case GETC: {
+			char c = Console::Instance()->getc();
+			result = (uint64)(uint8)c;
 			break;
 		}
 		default: {

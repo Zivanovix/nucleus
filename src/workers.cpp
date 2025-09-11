@@ -7,13 +7,20 @@
 #include "../h/print.hpp"
 #include "../h/syscall_c.hpp"
 
-sem_t mutex;
+sem_t mutex = 0;
 
 
 void workerBodyA(void* p) {
-	int x = sem_open(&mutex, 1);
-	if(x == 0)
-	sem_wait(mutex);
+	//int x = sem_open(&mutex, 1);
+	//if(x == 0)
+	//sem_wait(mutex);
+
+	char c = getc();
+	c = getc();
+
+	putc(c);
+	putc('\n');
+
 	for (uint64 i = 0; i < 10; i++) {
 
 		printString("A: i=");
@@ -26,14 +33,14 @@ void workerBodyA(void* p) {
 			}
 		}
 	}
-	if(mutex)
-	sem_signal(mutex);
+	//if(mutex)
+	//sem_signal(mutex);
 	// TCB::yield()
 }
 
 void workerBodyB(void* p) {
-	if(mutex)
-		sem_wait(mutex);
+	//if(mutex)
+		//sem_wait(mutex);
 	for (uint64 i = 0; i < 16; i++) {
 
 		printString("B: i=");
@@ -45,8 +52,8 @@ void workerBodyB(void* p) {
 			}
 		}
 	}
-	if(mutex)
-	sem_signal(mutex);
+	//if(mutex)
+	//sem_signal(mutex);
 	// TCB::yield()
 }
 
@@ -71,14 +78,14 @@ void workerBodyC(void* p) {
 	}
 
 	printString("C: yield\n");
-	__asm__ ("li t1, 7");
+	__asm__ ("li s1, 7");
 
 	thread_dispatch();
-	uint64 t1 = 0;
-	__asm__ ("mv %[t1], t1" : [t1] "=r"(t1));
+	uint64 s1 = 0;
+	__asm__ ("mv %[s1], s1" : [s1] "=r"(s1));
 
-	printString("C: t1=");
-	printInteger(t1);
+	printString("C: s1=");
+	printInteger(s1);
 	printString("\n");
 
 	uint64 result = fibonacci(12);
@@ -107,18 +114,18 @@ void workerBodyD(void* p) {
 	}
 
 	printString("D: yield\n");
-	__asm__ ("li t1, 5");
+	__asm__ ("li s1, 5");
 
 	thread_dispatch();
-	uint64 t1 = 0;
+	uint64 s1 = 0;
 
-	__asm__ ("mv %[t1], t1" : [t1] "=r"(t1));
+	__asm__ ("mv %[s1], s1" : [s1] "=r"(s1));
 
-	printString("D: t1=");
-	printInteger(t1);
+	printString("D: s1=");
+	printInteger(s1);
 	printString("\n");
 
-	uint64 result = fibonacci(23);
+	uint64 result = fibonacci(12);
 	printString("D: fibonacci=");
 	printInteger(result);
 	printString("\n");
